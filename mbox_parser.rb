@@ -64,18 +64,6 @@ def find_in_aliases(aliases, email)
   end
 end
 
-def sort_senders_list(senders_list)
-  x = 1
-  while x < senders_list.size
-    if senders_list[x][2] < senders_list[x-1][2]
-      senders_list[x], senders_list[x-1] = senders_list[x-1], senders_list[x]
-      x = 0
-    end
-    x += 1
-  end
-end
-
-
 def output_senders_list(senders_list)
   x = 0
   while x < senders_list.size
@@ -94,16 +82,22 @@ if ARGV.size > 0
   aliases = parse_aliases
 end
 senders_list = []
+no_email = false
 while ln = $stdin.gets
-  if ln =~ /From:/
-    email = /<(.*?)>/.match(ln)[1]
-    if aliases.nil?
-      add_to_list(email, senders_list)
+  if (ln =~ /From:/) || (no_email == true && ln !~ /To:/)
+    no_email =false
+    if (/<(.*?)>/.match(ln)).nil?
+      no_email = true
     else
-      name, email = find_in_aliases(aliases, email)
-      add_to_list(name, email, senders_list)
+      email = /<(.*?)>/.match(ln)[1]
+      if aliases.nil?
+        add_to_list(email, senders_list)
+      else
+        name, email = find_in_aliases(aliases, email)
+        add_to_list(name, email, senders_list)
+      end
     end
   end
 end
-sort_senders_list(senders_list)
+senders_list.sort! { |a,b| a[2] <=> b[2] }
 output_senders_list(senders_list)
