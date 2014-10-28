@@ -84,7 +84,7 @@ end
 senders_list = []
 no_email = false
 while ln = $stdin.gets
-  if (ln =~ /From:/) || (no_email == true && ln !~ /To:/)
+  if (ln =~ /From:/) || (no_email == true)
     no_email = false
     if (/<(.*?)>/.match(ln)).nil?
       no_email = true
